@@ -1,27 +1,10 @@
 <template>
-	<view>
-<!-- 		<div>今天要做的事</div>
-		<ul class="tar_list">
-			<li>序号</li>
-			<li>事项</li>
-			<li>操作</li>
-		</ul>
-		<ul class="tar_list" v-for="(item, index) in workList">
-			<li>{{ index + 1 }}</li>
-			<li>{{ item }}</li>
-			<li><div class="finish_btn">确认完成</div></li>
-		</ul> -->
-		<div>今日目标</div>
-		<ul class="tar_list">
-			<li>序号</li>
-			<li>目标</li>
-			<li>操作</li>
-		</ul>
-		<ul class="tar_list" v-for="(item, index) in targetList">
-			<li>{{ index + 1 }}</li>
-			<li>{{ item }}</li>
-			<li><div class="finish_btn">确认完成</div></li>
-		</ul>
+	<view class="showList">
+		<div>在过去的一个月里面</div>
+		<div>设定了{{ allTarget }}个目标</div>
+		<div>完成了{{ successTarget }}个目标</div>
+		<div>完成率为{{ comRate }}%</div>
+		<div>加油，为了更好的自己</div>
 	</view>
 </template>
 
@@ -29,34 +12,75 @@
 export default {
 	data() {
 		return {
-			targetList: [1, 2, 3],
-			workList: [3, 2, 1]
+			allTarget: 0,
+			successTarget: 0,
+			comRate: 0
 		};
+	},
+
+	onReady() {
+		const that = this;
+		const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
+		const startTime = timeStamp - 86400 * 30;
+		const params = {
+			startTime: startTime,
+			endTime: timeStamp,
+			userId: 1
+		};
+		uni.request({
+			url: 'http://118.24.179.175:7001/timeTarget', //仅为示例，并非真实接口地址。
+			method: 'POST',
+			data: params,
+			success: function(res) {
+				console.log(res.data);
+				let targetList = [];
+				res.data.forEach((item, index) => {
+					targetList = targetList.concat(JSON.parse(item.target));
+				});
+				targetList.forEach((item, index) => {
+					if (item.success == true) {
+						that.successTarget++;
+					}
+				});
+				that.allTarget = targetList.length;
+				that.comRate = parseInt((that.successTarget / that.allTarget) * 100);
+			}
+		});
+	},
+	methods: {
+		//假数据插入
+		test() {
+			let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
+			// 一天是86400秒   故 7 天前的时间戳为
+			timeStamp = timeStamp - 86400 * 4;
+			let targetArr = [{ title: '321', success: false }, { title: '123', success: true }];
+			targetArr = JSON.stringify(targetArr);
+			let params = {
+				target: targetArr,
+				timestamp: timeStamp,
+				userId: 2
+			};
+			uni.request({
+				url: 'http://118.24.179.175:7001/setTarget', //仅为示例，并非真实接口地址。
+				method: 'POST',
+				data: params,
+				success: function(res) {
+					if (res.data.title == 'success') {
+						alert('目标设定成功！');
+					}
+				}
+			});
+		}
 	}
 };
 </script>
 
 <style lang="scss" scoped>
-.tar_list {
-	list-style: none;
-	font-size: 28rpx;
-	color: #333333;
-	margin-bottom: 15rpx;
-	li {
-		display: inline-block;
-		width: 33%;
-		vertical-align: middle;
-		text-align: center;
-		word-break: break-all;
+	.showList{
+		div{
+			margin:20rpx;
+			font-size: 36rpx;
+		}
 	}
-}
-
-.finish_btn {
-	display: inline-block;
-	padding: 5rpx 20rpx;
-	font-size: 28rpx;
-	color: white;
-	background: rgba(56, 125, 255, 1);
-	border-radius: 12rpx;
-}
+	
 </style>

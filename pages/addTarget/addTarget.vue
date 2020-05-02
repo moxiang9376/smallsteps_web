@@ -4,7 +4,7 @@
 		<input class="inp" maxlength="255" v-model="text" />
 		<div class="btn_box">
 			<div class="btn_line"><div class="make_sure_btn" @click="addTarget()">添加目标</div></div>
-			<div class="btn_line"><div class="make_sure_btn">上传目标</div></div>
+			<div class="btn_line"><div class="make_sure_btn" @click="uploadTarget()">上传目标</div></div>
 		</div>
 
 		<ul class="tar_list">
@@ -13,9 +13,13 @@
 			<li>操作</li>
 		</ul>
 		<ul class="tar_list" v-for="(item, index) in targetArr">
-			<li>{{index + 1}}</li>
-			<li>{{ item }}</li>
-			<li><div class="del_btn" @click="delTarget(index)">删除</div></li>
+			<li>{{ index + 1 }}</li>
+			<li>{{ item.title }}</li>
+			<li>
+				<div class="del_btn" @click="delTarget(index)">删除</div>
+				<!-- <div class="success_btn" v-if="item.success">已完成</div> -->
+			</li>
+			
 		</ul>
 	</view>
 </template>
@@ -30,13 +34,33 @@ export default {
 		};
 	},
 	onLoad() {},
-	created() {
+	onShow() {
 		let that = this;
 		let day2 = new Date();
 		day2.setTime(day2.getTime());
 		let s2 = day2.getFullYear() + '-' + (day2.getMonth() + 1) + '-' + day2.getDate();
 		console.log(s2);
 		that.today = s2;
+
+		const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
+		let data = {
+			timestamp: timeStamp,
+			userId: 1
+		};
+		uni.request({
+			url: 'http://118.24.179.175:7001/getTodayTarget', //仅为示例，并非真实接口地址。
+			method: 'post',
+			data: data,
+			success: function(res) {
+				console.log(res.data);
+				that.targetArr = JSON.parse(res.data[0].target);
+			}
+		});
+	},
+	
+	onHide(){
+		const that = this
+		that.uploadTarget()
 	},
 	methods: {
 		//添加目标
@@ -45,8 +69,13 @@ export default {
 			if (that.text === '' || that.text === null || that.text === undefined) {
 				alert('输入目标不能为空');
 			} else {
-				that.targetArr.push(that.text);
-				console.log(that.targetArr);
+				if (that.targetArr.length <= 4) {
+					that.targetArr.push({ title: that.text, success: false });
+					console.log(that.targetArr);
+				} else {
+					alert('目标在精不在多，集中精力在目前的目标上吧！');
+				}
+
 				that.text = '';
 			}
 		},
@@ -56,6 +85,28 @@ export default {
 			const that = this;
 			that.targetArr.splice(index, 1);
 			console.log(that.targetArr);
+		},
+		//上传目标
+		uploadTarget() {
+			const that = this;
+			const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
+			let targetArr = JSON.stringify(that.targetArr);
+			console.log(targetArr);
+			let params = {
+				target: targetArr,
+				timestamp: timeStamp,
+				userId: 1
+			};
+			uni.request({
+				url: 'http://118.24.179.175:7001/setTarget', //仅为示例，并非真实接口地址。
+				method: 'POST',
+				data: params,
+				success: function(res) {
+					if(res.data.title == "success"){
+						alert("目标设定成功！")
+					}
+				}
+			});
 		}
 	}
 };
@@ -75,9 +126,9 @@ export default {
 
 .btn_box {
 	width: 100%;
-	.btn_line{
+	.btn_line {
 		display: inline-block;
-		width:50%;
+		width: 50%;
 		text-align: center;
 	}
 }
@@ -112,10 +163,19 @@ export default {
 }
 
 .del_btn {
-	width: 70rpx;
-	margin: 0 auto;
-	text-align: center;
 	color: white;
 	background-color: #ff3b30;
+	display: inline-block;
+	padding: 5rpx 20rpx;
+	font-size: 28rpx;
+	border-radius: 12rpx;
+}
+
+.success_btn {
+	display: inline-block;
+	padding: 5rpx 20rpx;
+	font-size: 28rpx;
+	color: #3CC457;
+	border-radius: 12rpx;
 }
 </style>
