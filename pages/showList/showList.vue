@@ -76,11 +76,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	.showList{
-		div{
-			margin:20rpx;
-			font-size: 36rpx;
-		}
+.showList {
+	div {
+		margin: 20rpx;
+		font-size: 36rpx;
 	}
-	
+}
 </style>
