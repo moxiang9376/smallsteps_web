@@ -1,0 +1,70 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "跬步"
+			}
+		}, {
+			"path": "pages/targetList/targetList",
+			"style": {
+				"navigationBarTitleText": "跬步"
+			}
+
+		}, {
+			"path": "pages/personal/personal",
+			"style": {
+				"navigationBarTitleText": "跬步"
+			}
+		}
+        ,{
+            "path" : "pages/perWork/perWork",
+            "style" : {
+				"navigationBarTitleText": "跬步"
+			}
+        }
+        ,{
+            "path" : "pages/addTarget/addTarget",
+            "style" : {
+				"navigationBarTitleText": "跬步"
+			}
+        }
+
+        ,{
+            "path" : "pages/showList/showList",
+            "style" : {
+				"navigationBarTitleText": "跬步"
+			}
+        }
+        ,{
+            "path" : "pages/addWork/addWork",
+            "style" : {}
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#333333",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "white",
+		"selectedColor": "deepskyblue",
+		"backgroundColor": "#333333",
+		"borderStyle": "black",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/showList/showList",
+				"text": "列表"
+			},
+			{
+				"pagePath": "pages/personal/personal",
+				"text": "我的"
+			}
+
+		]
+	}
+}
