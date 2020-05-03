@@ -20,12 +20,13 @@ export default {
 
 	onReady() {
 		const that = this;
+		const userInfo = that.common.getUserInfo()
 		const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
 		const startTime = timeStamp - 86400 * 30;
 		const params = {
 			startTime: startTime,
 			endTime: timeStamp,
-			userId: 1
+			userId: userInfo.id
 		};
 		uni.request({
 			url: 'http://118.24.179.175:7001/timeTarget', //仅为示例，并非真实接口地址。
@@ -33,6 +34,9 @@ export default {
 			data: params,
 			success: function(res) {
 				console.log(res.data);
+				if (res.data === 'error') {
+					return;
+				}
 				let targetList = [];
 				res.data.forEach((item, index) => {
 					targetList = targetList.concat(JSON.parse(item.target));
@@ -48,29 +52,7 @@ export default {
 		});
 	},
 	methods: {
-		//假数据插入
-		test() {
-			let timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
-			// 一天是86400秒   故 7 天前的时间戳为
-			timeStamp = timeStamp - 86400 * 4;
-			let targetArr = [{ title: '321', success: false }, { title: '123', success: true }];
-			targetArr = JSON.stringify(targetArr);
-			let params = {
-				target: targetArr,
-				timestamp: timeStamp,
-				userId: 2
-			};
-			uni.request({
-				url: 'http://118.24.179.175:7001/setTarget', //仅为示例，并非真实接口地址。
-				method: 'POST',
-				data: params,
-				success: function(res) {
-					if (res.data.title == 'success') {
-						alert('目标设定成功！');
-					}
-				}
-			});
-		}
+
 	}
 };
 </script>

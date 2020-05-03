@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<div>过去一个月数据统计</div>
+		<div class="title">过去一个月数据统计</div>
 		<view class="qiun-charts">
 			<!--#ifdef MP-ALIPAY -->
 			<canvas
@@ -22,7 +22,6 @@
 
 <script>
 import uCharts from '../../components/u-charts.js';
-// import  { isJSON } from '@/common/checker.js';
 var _self;
 var canvaPie = null;
 
@@ -32,9 +31,7 @@ export default {
 			cWidth: '',
 			cHeight: '',
 			pixelRatio: 1,
-			textarea: '',
-			successTarget:0,
-			allTarget:0
+			textarea: ''
 		};
 	},
 	onLoad() {
@@ -57,12 +54,13 @@ export default {
 	methods: {
 		getServerData() {
 			const that = this;
+			const userInfo = that.common.getUserInfo();
 			const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
 			const startTime = timeStamp - 86400 * 30;
 			const params = {
 				startTime: startTime,
 				endTime: timeStamp,
-				userId: 1
+				userId: userInfo.id
 			};
 			uni.request({
 				url: 'http://118.24.179.175:7001/timeTarget', //仅为示例，并非真实接口地址。
@@ -70,46 +68,40 @@ export default {
 				data: params,
 				success: function(res) {
 					console.log(res.data);
+					if (res.data === 'error') {
+						return;
+					}
 					let targetList = [];
 					res.data.forEach((item, index) => {
 						targetList = targetList.concat(JSON.parse(item.target));
 					});
+					let successTarget = 0;
+					let failTarget = 0;
 					targetList.forEach((item, index) => {
 						if (item.success == true) {
-							that.successTarget++;
+							successTarget++;
+						} else {
+							failTarget++;
 						}
 					});
-					that.allTarget = targetList.length;
-					that.comRate = parseInt((that.successTarget / that.allTarget) * 100);
-					
-					
-					let Pie = { series: [] };
-					Pie.series.push({
-						color:"#1890ff",
-						data:that.successTarget,
-						index:0,
-						legendShape:"circle",
-						name:"已完成",
-						pointShape:"circle",
-						show:true,
-						type:"pie"
-					})
-					
-					Pie.series.push({
-						color:"#2fc25b",
-						data:that.allTarget-that.successTarget,
-						index:0,
-						legendShape:"circle",
-						name:"未完成",
-						pointShape:"circle",
-						show:true,
-						type:"pie"
-					})
-					_self.showPie("canvasPie",Pie);
+
+					let dataArr = [];
+					dataArr.push({
+						name: '未完成',
+						color: '#2fc25b',
+						data: failTarget
+					});
+					dataArr.push({
+						name: '已完成',
+						color: '#1890ff',
+						data: successTarget
+					});
+					dataArr = that.common.uchartPieSetArr(dataArr);
+					_self.showPie('canvasPie', dataArr);
 				}
 			});
 		},
-		
+
 		showPie(canvasId, chartData) {
 			canvaPie = new uCharts({
 				$this: _self,
@@ -152,6 +144,11 @@ export default {
 </script>
 
 <style lang="scss">
+.title {
+	font-size: 36upx;
+	padding: 20upx;
+}
+
 /*样式的width和height一定要与定义的cWidth和cHeight相对应*/
 .qiun-charts {
 	width: 750upx;

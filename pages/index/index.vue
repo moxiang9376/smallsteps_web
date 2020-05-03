@@ -32,10 +32,11 @@ export default {
 	},
 	onShow() {
 		const that = this;
+		const userInfo = that.common.getUserInfo();
 		const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
 		let data = {
 			timestamp: timeStamp,
-			userId: 1
+			userId: userInfo.id
 		};
 		uni.request({
 			url: 'http://118.24.179.175:7001/getTodayTarget', //仅为示例，并非真实接口地址。
@@ -43,6 +44,9 @@ export default {
 			data: data,
 			success: function(res) {
 				console.log(res.data);
+				if (res.data.length == 0) {
+					return;
+				}
 				that.targetList = JSON.parse(res.data[0].target);
 			}
 		});
@@ -68,6 +72,7 @@ export default {
 		//确认完成
 		make_success(index) {
 			const that = this;
+			const userInfo = that.common.getUserInfo();
 			that.targetList[index].success = true;
 			const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
 			let targetArr = JSON.stringify(that.targetList);
@@ -75,7 +80,7 @@ export default {
 			let data = {
 				target: targetArr,
 				timestamp: timeStamp,
-				userId: 1
+				userId: userInfo.id
 			};
 			uni.request({
 				url: 'http://118.24.179.175:7001/setTarget',

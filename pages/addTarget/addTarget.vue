@@ -19,7 +19,6 @@
 				<div class="del_btn" @click="delTarget(index)">删除</div>
 				<!-- <div class="success_btn" v-if="item.success">已完成</div> -->
 			</li>
-			
 		</ul>
 	</view>
 </template>
@@ -30,22 +29,18 @@ export default {
 		return {
 			text: '',
 			targetArr: [],
-			today: ''
+			today: '',
+			userInfo:null
 		};
 	},
 	onLoad() {},
 	onShow() {
-		let that = this;
-		let day2 = new Date();
-		day2.setTime(day2.getTime());
-		let s2 = day2.getFullYear() + '-' + (day2.getMonth() + 1) + '-' + day2.getDate();
-		console.log(s2);
-		that.today = s2;
-
+		const that = this;		
+		const userInfo = that.common.getUserInfo()
 		const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
-		let data = {
+		const data = {
 			timestamp: timeStamp,
-			userId: 1
+			userId: userInfo.id
 		};
 		uni.request({
 			url: 'http://118.24.179.175:7001/getTodayTarget', //仅为示例，并非真实接口地址。
@@ -53,14 +48,16 @@ export default {
 			data: data,
 			success: function(res) {
 				console.log(res.data);
-				that.targetArr = JSON.parse(res.data[0].target);
+				if (res.data.length != 0) {
+					that.targetArr = JSON.parse(res.data[0].target);
+				}
 			}
 		});
 	},
-	
-	onHide(){
-		const that = this
-		that.uploadTarget()
+
+	onHide() {
+		const that = this;
+		that.uploadTarget();
 	},
 	methods: {
 		//添加目标
@@ -89,21 +86,22 @@ export default {
 		//上传目标
 		uploadTarget() {
 			const that = this;
+				const userInfo = that.common.getUserInfo()
 			const timeStamp = new Date(new Date().setHours(0, 0, 0, 0)) / 1000;
 			let targetArr = JSON.stringify(that.targetArr);
 			console.log(targetArr);
 			let params = {
 				target: targetArr,
 				timestamp: timeStamp,
-				userId: 1
+				userId: userInfo.id
 			};
 			uni.request({
 				url: 'http://118.24.179.175:7001/setTarget', //仅为示例，并非真实接口地址。
 				method: 'POST',
 				data: params,
 				success: function(res) {
-					if(res.data.title == "success"){
-						alert("目标设定成功！")
+					if (res.data.title == 'success') {
+						alert('目标设定成功！');
 					}
 				}
 			});
@@ -175,7 +173,7 @@ export default {
 	display: inline-block;
 	padding: 5rpx 20rpx;
 	font-size: 28rpx;
-	color: #3CC457;
+	color: #3cc457;
 	border-radius: 12rpx;
 }
 </style>
