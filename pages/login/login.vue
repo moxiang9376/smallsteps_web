@@ -32,17 +32,14 @@ export default {
 				pwd: that.password
 			};
 
-			if(params.name === ""){
-				alert("请输入账户")
-				return
+			if (params.name === '') {
+				alert('请输入账户');
+				return;
 			}
-			if(params.pwd === ""){
-				alert("请输入密码")
-				return
+			if (params.pwd === '') {
+				alert('请输入密码');
+				return;
 			}
-	
-				
-			
 
 			uni.request({
 				method: 'post',
@@ -58,8 +55,8 @@ export default {
 							name: res.data.name
 						};
 						sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-						let hello = that.common.getUserInfo()
-						console.log(hello)
+						let hello = that.common.getUserInfo();
+						console.log(hello);
 						uni.switchTab({
 							url: '../index/index',
 							success: res => {},

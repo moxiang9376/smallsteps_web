@@ -60,8 +60,8 @@ export default {
 <style lang="scss" scoped>
 .showList {
 	div {
-		margin: 20rpx;
-		font-size: 36rpx;
+		margin: 20upx;
+		font-size: 36upx;
 	}
 }
 </style>
